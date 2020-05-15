@@ -31,6 +31,9 @@ const failAdded = error => ({
 const getAllCars = () => dispatch => {
   axios.get('api/cars').then(res => dispatch(receiveCars(res.data)));
 };
+const getCarsOnTerritory = () => dispatch => {
+  axios.get('api/stat/here/').then(res => dispatch(receiveCars(res.data)));
+};
 
 const addCar = (car, cb) => dispatch => {
   axios({
@@ -65,4 +68,11 @@ const addCarToParking = (history, cb) => dispatch => {
     }
   );
 };
-export {receiveCars, addNewCar, getAllCars, addCar, addCarToParking};
+export {
+  receiveCars,
+  addNewCar,
+  getAllCars,
+  addCar,
+  addCarToParking,
+  getCarsOnTerritory,
+};

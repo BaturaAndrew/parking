@@ -1,15 +1,68 @@
 import React, {Component} from 'react';
+import axios from 'axios';
+// eslint-disable-next-line no-unused-vars
+import _ from 'lodash';
 import {connect} from 'react-redux';
 import * as PropTypes from 'prop-types';
-import {Table, Tag, Button, Modal, Form, Input, Space, message} from 'antd';
 import {
-  SendOutlined,
-  SearchOutlined,
-  ArrowLeftOutlined,
-} from '@ant-design/icons';
-import Highlighter from 'react-highlight-words';
-import {getAllCars, addCar, addCarToParking} from './actions/carActions';
+  Table,
+  Tag,
+  Button,
+  Modal,
+  Form,
+  Input,
+  message,
+  Collapse,
+  Switch,
+} from 'antd';
+import {SendOutlined, ArrowLeftOutlined} from '@ant-design/icons';
+import {receiveCars, addCar, addCarToParking} from './actions/carActions';
 import './App.scss';
+
+const {Panel} = Collapse;
+const {Search} = Input;
+
+const columns = [
+  {
+    title: 'Бренд',
+    dataIndex: 'car_brand',
+    key: 'car_brand',
+    render: brand => (
+      <div>
+        {(brand && `${brand.name}`) || <Tag color="red">не заполнено</Tag>}
+      </div>
+    ),
+  },
+  {
+    title: 'Модель',
+    dataIndex: 'car_model',
+    key: 'car_model',
+    render: model => (
+      <div>
+        {(model && `${model.name}`) || <Tag color="red">не заполнено</Tag>}
+      </div>
+    ),
+  },
+  {
+    title: 'Номер',
+    dataIndex: 'car_number',
+    key: 'car_number',
+    sorter: (a, b) => a.car_number < b.car_number,
+    sortDirections: ['descend', 'ascend'],
+  },
+  {
+    title: 'Арендатор',
+    dataIndex: 'car_tenant',
+    key: 'car_tenant',
+    sorter: (a, b) => a.car_tenant.id - b.car_tenant.id,
+    sortDirections: ['descend', 'ascend'],
+    render: text => (
+      <div>
+        {(text && `${text.name}`) || <Tag color="red">не заполнено</Tag>}
+      </div>
+    ),
+  },
+];
 
 class App extends Component {
   constructor() {
@@ -19,12 +72,15 @@ class App extends Component {
       modalVisible: false,
       searchText: '',
       searchedColumn: '',
+      filteredCars: [],
+      filter: {
+        car_tenant: {name: ''},
+      },
     };
   }
 
   componentDidMount() {
-    const {dispatch} = this.props;
-    dispatch(getAllCars());
+    this.getAllCars();
   }
 
   onChange = curState => {
@@ -34,9 +90,42 @@ class App extends Component {
     }));
   };
 
+  onSwitch = curState => {
+    this.setState(prevState => ({
+      ...prevState,
+      switch: curState.switch,
+    }));
+
+    !this.state.switch ? this.getCarsOnTerritory() : this.getAllCars();
+  };
+
+  onFilterEnter = (value, field) => {
+    this.setState(
+      prevState => ({
+        ...prevState,
+        filter: {...prevState.filter, car_tenant: {name: value}},
+      }),
+      () => this.filter()
+    );
+  };
+
   setModalVisible(modalVisible) {
     this.setState({modalVisible});
   }
+
+  filter = () => {
+    const {filter, cars} = this.state;
+    const objFilter = {};
+
+    filter.car_tenant.name && (objFilter.car_tenant = filter.car_tenant);
+
+    const filterCars = _.filter(cars, objFilter);
+
+    this.setState(prevState => ({
+      ...prevState,
+      filteredCars: filterCars,
+    }));
+  };
 
   isValidForm = () => {
     const car = this.form.current.getFieldsValue();
@@ -48,19 +137,6 @@ class App extends Component {
       return false;
     }
     return true;
-  };
-
-  handleSearch = (selectedKeys, confirm, dataIndex) => {
-    confirm();
-    this.setState({
-      searchText: selectedKeys[0],
-      searchedColumn: dataIndex,
-    });
-  };
-
-  handleReset = clearFilters => {
-    clearFilters();
-    this.setState({searchText: ''});
   };
 
   addNewCar = () => {
@@ -99,113 +175,27 @@ class App extends Component {
     }
   };
 
+  getAllCars = () => {
+    const {dispatch} = this.props;
+    axios.get('api/cars').then(res => {
+      const {data} = res;
+      dispatch(receiveCars(data));
+      this.setState({cars: data, filteredCars: data});
+    });
+  };
+
+  getCarsOnTerritory = () => {
+    const {dispatch} = this.props;
+    axios.get('api/stat/here/').then(res => {
+      const {data} = res;
+      dispatch(receiveCars(data));
+      this.setState({cars: data, filteredCars: data});
+    });
+  };
+
   render() {
-    const columns = [
-      {
-        title: 'Бренд',
-        dataIndex: 'car_brand',
-        key: 'car_brand',
-        render: brand => (
-          <div>
-            {(brand && `${brand.name}`) || <Tag color="red">не заполнено</Tag>}
-          </div>
-        ),
-      },
-      {
-        title: 'Модель',
-        dataIndex: 'car_model',
-        key: 'car_model',
-        render: model => (
-          <div>
-            {(model && `${model.name}`) || <Tag color="red">не заполнено</Tag>}
-          </div>
-        ),
-      },
-      {
-        title: 'Номер',
-        dataIndex: 'car_number',
-        key: 'car_number',
-        sorter: (a, b) => a.car_number < b.car_number,
-        sortDirections: ['descend', 'ascend'],
-      },
-      {
-        title: 'Арендатор',
-        dataIndex: 'car_tenant',
-        key: 'car_tenant',
+    const {filteredCars} = this.state;
 
-        sorter: (a, b) => a.car_tenant.id - b.car_tenant.id,
-        sortDirections: ['descend', 'ascend'],
-        // FIXME: delete this filter
-        filterDropdown: ({
-          setSelectedKeys,
-          selectedKeys,
-          confirm,
-          clearFilters,
-        }) => (
-          <div>
-            <Input
-              ref={node => {
-                this.searchInput = node;
-              }}
-              placeholder={`Search ${'car_tenant'}`}
-              value={selectedKeys[0]}
-              onChange={e =>
-                setSelectedKeys(e.target.value ? [e.target.value] : [])
-              }
-              onPressEnter={() =>
-                this.handleSearch(selectedKeys, confirm, 'car_tenant')
-              }
-              style={{width: 188, marginBottom: 8, display: 'block'}}
-            />
-            <Space>
-              <Button
-                type="primary"
-                onClick={() =>
-                  this.handleSearch(selectedKeys, confirm, 'car_tenant')
-                }
-                icon={<SearchOutlined />}
-                size="small"
-                style={{width: 90}}>
-                Search
-              </Button>
-              <Button
-                onClick={() => this.handleReset(clearFilters)}
-                size="small"
-                style={{width: 90}}>
-                Reset
-              </Button>
-            </Space>
-          </div>
-        ),
-
-        filterIcon: filtered => (
-          <SearchOutlined style={{color: filtered ? '#1890ff' : undefined}} />
-        ),
-
-        onFilter: (value, record) =>
-          record.car_tenant.name.toString().includes(value),
-
-        onFilterDropdownVisibleChange: visible => {
-          if (visible) {
-            setTimeout(() => this.searchInput.select());
-          }
-        },
-        render: text =>
-          this.state.searchedColumn === 'car_tenant' ? (
-            <Highlighter
-              highlightStyle={{backgroundColor: '#ffc069', padding: 0}}
-              searchWords={[this.state.searchText]}
-              autoEscape
-              textToHighlight={text && `${text.name}`}
-            />
-          ) : (
-            <div>
-              {(text && `${text.name}`) || <Tag color="red">не заполнено</Tag>}
-            </div>
-          ),
-      },
-    ];
-    const {cars} = this.props;
     return (
       <div>
         <Button type="primary" onClick={() => this.setModalVisible(true)}>
@@ -214,6 +204,21 @@ class App extends Component {
         <Button type="primary" onClick={this.addCarEntry}>
           Добавить машину на парковку
         </Button>
+        <Collapse defaultActiveKey={['0']}>
+          <Panel header="Фильтр" key="1">
+            <Search
+              name="car_tenant"
+              allowClear
+              placeholder="Альфа-Банк ЗАО"
+              key="car_tenant"
+              onSearch={value => this.onFilterEnter(value, 'car_tenant')}
+              style={{width: 350, margin: 5}}
+            />
+            <Switch onChange={value => this.onSwitch({switch: value})}>
+              Aвтомобили на территории
+            </Switch>
+          </Panel>
+        </Collapse>
         <Modal
           title="Добавление машины"
           style={{top: 20}}
@@ -296,12 +301,13 @@ class App extends Component {
         <Table
           scroll={{y: 570}}
           style={{border: '1px solid #d7d4d4'}}
-          dataSource={cars}
+          dataSource={filteredCars}
           columns={columns}
           rowKey={record => record.id}
           pagination={{
-            pageSizeOptions: ['10', '25', '40', '50', '100'],
+            pageSizeOptions: ['8', '25', '40', '50', '100'],
             showSizeChanger: true,
+            pageSize: 8,
           }}
         />
       </div>
@@ -314,9 +320,9 @@ const mapStateToProps = store => ({cars: store.cars});
 export default connect(mapStateToProps)(App);
 App.propTypes = {
   dispatch: PropTypes.func.isRequired,
-  cars: PropTypes.arrayOf(PropTypes.object),
+  // cars: PropTypes.arrayOf(PropTypes.object),
 };
 
 App.defaultProps = {
-  cars: [],
+  // cars: [],
 };
