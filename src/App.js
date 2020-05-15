@@ -1,14 +1,14 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import * as PropTypes from 'prop-types';
-import {Table, Tag, Button, Modal, Form, Input, Space} from 'antd';
+import {Table, Tag, Button, Modal, Form, Input, Space, message} from 'antd';
 import {
   SendOutlined,
   SearchOutlined,
   ArrowLeftOutlined,
 } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
-import {getAllCars} from './actions/carActions';
+import {getAllCars, addCar, addCarToParking} from './actions/carActions';
 import './App.scss';
 
 class App extends Component {
@@ -65,30 +65,49 @@ class App extends Component {
 
   addNewCar = () => {
     if (!this.isValidForm()) return;
-    console.log('added');
-    // TODO: implement a function for adding a new car
-    // const {dispatch, car} = this.props;
-    // dispatch(sendEmail(email.id));
+    const {dispatch} = this.props;
+    const {car} = this.state;
+    const newCar = {
+      car_number: car.car_number,
+      car_brand: +car.car_brand,
+      car_model: +car.car_model,
+      car_tenant: +car.car_tenant,
+    };
+
+    dispatch(addCar(newCar, this.notification));
     this.setModalVisible(false);
+  };
+
+  addCarEntry = () => {
+    const {dispatch} = this.props;
+    const history = {
+      time_in: '16:55:48',
+      days: '15.05.2020',
+      last_flag: false,
+      car: 187,
+    };
+
+    dispatch(addCarToParking(history, this.notification));
+    this.setModalVisible(false);
+  };
+
+  notification = status => {
+    if (status.status === 200 || status.status === 201) {
+      message.success(`${status.statusText}`);
+    } else {
+      message.error(`${status.message}`);
+    }
   };
 
   render() {
     const columns = [
-      {
-        title: 'Id',
-        dataIndex: 'id',
-        key: 'id',
-        width: 100,
-      },
       {
         title: 'Бренд',
         dataIndex: 'car_brand',
         key: 'car_brand',
         render: brand => (
           <div>
-            {(brand && `${brand.id} ${brand.name}`) || (
-              <Tag color="red">не заполнено</Tag>
-            )}
+            {(brand && `${brand.name}`) || <Tag color="red">не заполнено</Tag>}
           </div>
         ),
       },
@@ -98,9 +117,7 @@ class App extends Component {
         key: 'car_model',
         render: model => (
           <div>
-            {(model && `${model.id} ${model.name}`) || (
-              <Tag color="red">не заполнено</Tag>
-            )}
+            {(model && `${model.name}`) || <Tag color="red">не заполнено</Tag>}
           </div>
         ),
       },
@@ -194,45 +211,61 @@ class App extends Component {
         <Button type="primary" onClick={() => this.setModalVisible(true)}>
           Добавить машину
         </Button>
+        <Button type="primary" onClick={this.addCarEntry}>
+          Добавить машину на парковку
+        </Button>
         <Modal
           title="Добавление машины"
           style={{top: 20}}
           visible={this.state.modalVisible}
+          onOk={() => this.setModalVisible(false)}
+          onCancel={() => this.setModalVisible(false)}
           okButtonProps={{style: {display: 'none'}}}
           cancelButtonProps={{style: {display: 'none'}}}>
-          {/* TODO: add id for each field */}
           <Form ref={this.form} layout="vertical" name="nest-messages">
             <Form.Item
-              name="car_tenant"
-              label="Арендатор"
+              name="car_number"
+              label="Номер авто"
               rules={[
-                {required: true, message: 'Пожалуйста, введите арендатора!'},
+                {required: true, message: 'Пожалуйста, введите номер авто!'},
               ]}>
               <Input
-                placeholder="7 Альфа-Банк ЗАО"
-                onChange={e => this.onChange({car_tenant: e.target.value})}
+                placeholder="AA 2099-7"
+                onChange={e => this.onChange({car_number: e.target.value})}
               />
             </Form.Item>
+
             <Form.Item
               name="car_brand"
-              label="Бренда авто"
+              label="Бренда авто (id)"
               rules={[
                 {required: true, message: 'Пожалуйста, введите бренда авто!'},
               ]}>
               <Input
-                placeholder="134 ГАЗ"
+                placeholder="134 (ГАЗ)"
                 onChange={e => this.onChange({car_brand: e.target.value})}
               />
             </Form.Item>
             <Form.Item
               name="car_model"
-              label="Модель авто"
+              label="Модель авто (id)"
               rules={[
                 {required: true, message: 'Пожалуйста, введите модель авто!'},
               ]}>
               <Input
-                placeholder="1878 33023"
+                placeholder="1878 (33023)"
                 onChange={e => this.onChange({car_model: e.target.value})}
+              />
+            </Form.Item>
+            <Form.Item
+              name="car_tenant"
+              label="Арендатор (id)"
+              rules={[
+                {required: true, message: 'Пожалуйста, введите арендатора!'},
+              ]}>
+              <Input
+                placeholder="7 (Альфа-Банк ЗАО)"
+                onChange={e => this.onChange({car_tenant: e.target.value})}
               />
             </Form.Item>
 
