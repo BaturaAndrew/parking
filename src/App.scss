@@ -66,6 +66,14 @@ $main-border-color: #56abb7;
   &>.ant-collapse-item>.ant-collapse-header {
     background-color: beige;
   }
+
+  .ant-input-search {
+    @media screen and (max-width: 550px) {
+      width: 250px
+    }
+
+  }
+
 }
 
 .ant-table-thead {

@@ -7,6 +7,7 @@ import {ModalAddNewCar} from './components/Modals/ModalAddNewCar';
 import {ModalAddNewParkedCar} from './components/Modals/ModalAddNewParkedCar';
 import TableCars from './components/TableCars/TableCars';
 import Filter from './components/Filter/Filter';
+import {getAllBrands, getAllTenants} from './actions/carActions';
 
 class App extends Component {
   constructor() {
@@ -17,6 +18,12 @@ class App extends Component {
       cars: [],
       filteredCars: [],
     };
+  }
+
+  componentDidMount() {
+    const {dispatch} = this.props;
+    dispatch(getAllBrands());
+    dispatch(getAllTenants());
   }
 
   // NOTE: here we change the array of cars
@@ -34,6 +41,7 @@ class App extends Component {
 
   render() {
     const {cars, filteredCars} = this.state;
+    const {tenants} = this.props;
 
     return (
       <div>
@@ -57,6 +65,7 @@ class App extends Component {
           onChangeCars={this.onChangeCars}
           cars={cars}
           dispatch={this.props.dispatch}
+          tenants={tenants}
         />
 
         <ModalAddNewCar
@@ -83,10 +92,15 @@ class App extends Component {
   }
 }
 
-// NOTE: now it is for pass dispatch func from redux to Filter
-export default connect()(App);
+const mapStateToProps = store => ({
+  brands: store.brands,
+  tenants: store.tenants,
+});
+
+export default connect(mapStateToProps)(App);
 App.propTypes = {
   dispatch: PropTypes.func.isRequired,
+  tenants: PropTypes.arrayOf(PropTypes.object),
 };
 
-App.defaultProps = {};
+App.defaultProps = {tenants: []};

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import axios from 'axios';
-import {Input, Collapse, Switch, Typography} from 'antd';
+import {Input, Collapse, Switch, Typography, Select} from 'antd';
 import * as PropTypes from 'prop-types';
 import _ from 'lodash';
 import {receiveCars} from '../../actions/carActions';
@@ -8,6 +8,7 @@ import {receiveCars} from '../../actions/carActions';
 const {Panel} = Collapse;
 const {Search} = Input;
 const {Text} = Typography;
+const {Option} = Select;
 
 class Filter extends Component {
   constructor() {
@@ -108,24 +109,32 @@ class Filter extends Component {
   };
 
   render() {
+    const {tenants} = this.props;
+    const children = tenants.map(tenant => (
+      <Option key={tenant.id} value={tenant.name}>
+        {tenant.name}
+      </Option>
+    ));
+
     return (
       <Collapse defaultActiveKey={['0']}>
         <Panel header="Фильтр" key="1">
-          <Search
+          <Select
             name="car_tenant"
             allowClear
             placeholder="Альфа-Банк ЗАО"
-            key="car_tenant"
-            onSearch={value => this.onFilterEnter(value, 'car_tenant')}
-            style={{width: 350, margin: 5}}
-          />
+            onChange={value => this.onFilterEnter(value, 'car_tenant')}
+            style={{width: 250, margin: 5}}>
+            {children}
+          </Select>
+          ,
           <Search
             name="car_number"
             allowClear
             placeholder="3433 OO-5"
             key="car_number"
             onSearch={value => this.onFilterEnter(value, 'car_number')}
-            style={{width: 350, margin: 5}}
+            style={{width: 250, margin: 5}}
           />
           <Text code>Автомобили на территории</Text>
           <Switch onChange={value => this.onSwitch({switch: value})} />
@@ -140,6 +149,7 @@ Filter.propTypes = {
   dispatch: PropTypes.func.isRequired,
   cars: PropTypes.arrayOf(PropTypes.object),
   onChangeCars: PropTypes.func.isRequired,
+  tenants: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 Filter.defaultProps = {
