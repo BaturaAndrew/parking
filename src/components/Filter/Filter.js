@@ -15,7 +15,8 @@ class Filter extends Component {
     this.state = {
       filteredCars: [],
       filter: {
-        car_tenant: {name: ''},
+        objFilter: {car_tenant: {name: ''}},
+        car_number: '',
         id: [],
       },
     };
@@ -62,10 +63,18 @@ class Filter extends Component {
   };
 
   onFilterEnter = (value, field) => {
+    const filt = fl => {
+      if (fl === 'car_number') {
+        return {car_number: value};
+      }
+      return {objFilter: {car_tenant: {name: value}}};
+    };
+    const filter = filt(field);
+
     this.setState(
       prevState => ({
         ...prevState,
-        filter: {...prevState.filter, car_tenant: {name: value}},
+        filter: {...prevState.filter, ...filter},
       }),
       () => this.filter()
     );
@@ -74,15 +83,20 @@ class Filter extends Component {
   filter = () => {
     const {filter} = this.state;
     const {cars, onChangeCars} = this.props;
-    const objFilter = {};
-    let filterCars;
 
-    // FIXME: Unallowed reassignment
-    filter.car_tenant.name && (objFilter.car_tenant = filter.car_tenant);
-    filterCars = _.filter(cars, objFilter);
+    const filt = fl => {
+      if (filter.objFilter.car_tenant.name) {
+        return _.filter(cars, filter.objFilter);
+      }
+      if (filter.car_number) {
+        return cars.filter(car => car.car_number.includes(filter.car_number));
+      }
+      if (filter.id.length)
+        return cars.filter(car => filter.id.includes(car.id));
+      return cars;
+    };
 
-    filter.id.length &&
-      (filterCars = cars.filter(car => filter.id.includes(car.id)));
+    const filterCars = filt(filter);
 
     this.setState(
       prevState => ({
@@ -103,6 +117,14 @@ class Filter extends Component {
             placeholder="Альфа-Банк ЗАО"
             key="car_tenant"
             onSearch={value => this.onFilterEnter(value, 'car_tenant')}
+            style={{width: 350, margin: 5}}
+          />
+          <Search
+            name="car_number"
+            allowClear
+            placeholder="3433 OO-5"
+            key="car_number"
+            onSearch={value => this.onFilterEnter(value, 'car_number')}
             style={{width: 350, margin: 5}}
           />
           <Text code>Автомобили на территории</Text>

@@ -83,7 +83,7 @@ class App extends Component {
   }
 }
 
-// FIXME: now it is for pass dispatch func from redux to Filter
+// NOTE: now it is for pass dispatch func from redux to Filter
 export default connect()(App);
 App.propTypes = {
   dispatch: PropTypes.func.isRequired,
