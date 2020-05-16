@@ -41,7 +41,7 @@ class App extends Component {
 
   render() {
     const {cars, filteredCars} = this.state;
-    const {tenants} = this.props;
+    const {tenants, brands} = this.props;
 
     return (
       <div>
@@ -73,6 +73,8 @@ class App extends Component {
           modalVisible={this.state.modal1Visible}
           dispatch={this.props.dispatch}
           cars={this.state.cars}
+          brands={brands}
+          tenants={tenants}
         />
         <ModalAddNewParkedCar
           setModalVisible={this.setModal2Visible}
@@ -101,6 +103,7 @@ export default connect(mapStateToProps)(App);
 App.propTypes = {
   dispatch: PropTypes.func.isRequired,
   tenants: PropTypes.arrayOf(PropTypes.object),
+  brands: PropTypes.arrayOf(PropTypes.object),
 };
 
-App.defaultProps = {tenants: []};
+App.defaultProps = {tenants: [], brands: []};

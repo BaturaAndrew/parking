@@ -127,7 +127,7 @@ class Filter extends Component {
             style={{width: 250, margin: 5}}>
             {children}
           </Select>
-          ,
+
           <Search
             name="car_number"
             allowClear

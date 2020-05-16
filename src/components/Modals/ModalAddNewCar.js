@@ -1,9 +1,11 @@
 import React, {Component} from 'react';
-import {Button, Modal, Form, Input} from 'antd';
+import {Button, Modal, Form, Input, Select} from 'antd';
 import {SendOutlined, ArrowLeftOutlined} from '@ant-design/icons';
 import * as PropTypes from 'prop-types';
 import {addCar} from '../../actions/carActions';
 import {notification} from '../../helpers/notification';
+
+const {Option} = Select;
 
 class ModalAddNewCar extends Component {
   constructor() {
@@ -47,7 +49,19 @@ class ModalAddNewCar extends Component {
   };
 
   render() {
-    const {modalVisible, setModalVisible} = this.props;
+    const {modalVisible, setModalVisible, tenants, brands} = this.props;
+
+    const childrenTenants = tenants.map(tenant => (
+      <Option key={tenant.id} value={tenant.id}>
+        {tenant.name}
+      </Option>
+    ));
+    const childrenBrands = brands.map(brand => (
+      <Option key={brand.id} value={brand.id}>
+        {brand.name}
+      </Option>
+    ));
+
     return (
       <Modal
         title="Добавление машины"
@@ -76,11 +90,15 @@ class ModalAddNewCar extends Component {
             rules={[
               {required: true, message: 'Пожалуйста, введите бренда авто!'},
             ]}>
-            <Input
+            <Select
+              name="car_tenant"
+              allowClear
               placeholder="134 (ГАЗ)"
-              onChange={e => this.onChange({car_brand: e.target.value})}
-            />
+              onChange={value => this.onChange({car_brand: value})}>
+              {childrenBrands}
+            </Select>
           </Form.Item>
+
           <Form.Item
             name="car_model"
             label="Модель авто (id)"
@@ -92,16 +110,20 @@ class ModalAddNewCar extends Component {
               onChange={e => this.onChange({car_model: e.target.value})}
             />
           </Form.Item>
+
           <Form.Item
             name="car_tenant"
             label="Арендатор (id)"
             rules={[
               {required: true, message: 'Пожалуйста, введите арендатора!'},
             ]}>
-            <Input
+            <Select
+              name="car_tenant"
+              allowClear
               placeholder="7 (Альфа-Банк ЗАО)"
-              onChange={e => this.onChange({car_tenant: e.target.value})}
-            />
+              onChange={value => this.onChange({car_tenant: value})}>
+              {childrenTenants}
+            </Select>
           </Form.Item>
 
           <div className="button-block flex-row">
@@ -115,6 +137,7 @@ class ModalAddNewCar extends Component {
                 Закрыть форму
               </Button>
             </Form.Item>
+
             <Form.Item>
               <Button
                 className="send-btn"
@@ -138,6 +161,8 @@ ModalAddNewCar.propTypes = {
   dispatch: PropTypes.func.isRequired,
   modalVisible: PropTypes.bool.isRequired,
   setModalVisible: PropTypes.func.isRequired,
+  tenants: PropTypes.arrayOf(PropTypes.object).isRequired,
+  brands: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 ModalAddNewCar.defaultProps = {};
