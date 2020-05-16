@@ -1,3 +1,7 @@
+$main-color: #72a9b1;
+$main-hover-color: #a0bcc0;
+$main-border-color: #56abb7;
+
 .flex-column {
   display: flex;
   flex-direction: column;
@@ -19,14 +23,65 @@
 .button-block {
   align-items: flex-start;
   justify-content: flex-start;
+  margin-bottom: 10px;
 }
 
+.add-btn,
 .send-btn,
 .back-btn {
   margin-right: 20px;
+  background-color: $main-color;
+  border: none;
+
+  @media screen and (max-width: 750px) {
+    font-size: 70%;
+    padding: 5px;
+  }
 }
 
-.send-btn>span,
-.back-btn>span {
+.add-btn:hover,
+.add-btn:focus,
+.send-btn:hover,
+.send-btn:focus,
+.back-btn:hover,
+.back-btn:focus {
+  margin-right: 20px;
+  background-color: $main-hover-color;
+  border: none;
+}
+
+.add-btn>span {
   margin-right: 10px;
+}
+
+
+.ant-input:hover,
+.ant-input-affix-wrapper:hover {
+  border-color: $main-border-color;
+}
+
+.ant-collapse {
+  margin-bottom: 5px;
+
+  &>.ant-collapse-item>.ant-collapse-header {
+    background-color: beige;
+  }
+}
+
+.ant-table-thead {
+  @media screen and (max-width: 750px) {
+    font-size: 80%;
+  }
+}
+
+.ant-switch-checked {
+  background-color: $main-color;
+}
+
+.ant-tag {
+  @media screen and (max-width: 750px) {
+    margin: 0;
+    padding: 0;
+    font-size: 0.6rem;
+  }
 }
