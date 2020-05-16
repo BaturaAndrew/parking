@@ -14,15 +14,37 @@ import {
   message,
   Collapse,
   Switch,
+  Typography,
 } from 'antd';
 import {SendOutlined, ArrowLeftOutlined} from '@ant-design/icons';
 import {receiveCars, addCar, addCarToParking} from './actions/carActions';
 import './App.scss';
+import {sort} from './helpers/sort';
 
 const {Panel} = Collapse;
 const {Search} = Input;
+const {Text} = Typography;
 
 const columns = [
+  {
+    title: 'Арендатор',
+    dataIndex: 'car_tenant',
+    key: 'car_tenant',
+    sorter: (a, b) => sort(a, b, 'car_tenant'),
+    render: text => (
+      <div>
+        {(text && `${text.name}`) || <Tag color="red">не заполнено</Tag>}
+      </div>
+    ),
+  },
+  {
+    title: 'Номер',
+    dataIndex: 'car_number',
+    key: 'car_number',
+    sorter: (a, b) => sort(a, b, 'car_number'),
+    sortDirections: ['descend', 'ascend'],
+  },
+
   {
     title: 'Бренд',
     dataIndex: 'car_brand',
@@ -32,6 +54,8 @@ const columns = [
         {(brand && `${brand.name}`) || <Tag color="red">не заполнено</Tag>}
       </div>
     ),
+    sorter: (a, b) => sort(a, b, 'car_brand'),
+    sortDirections: ['descend', 'ascend'],
   },
   {
     title: 'Модель',
@@ -42,25 +66,8 @@ const columns = [
         {(model && `${model.name}`) || <Tag color="red">не заполнено</Tag>}
       </div>
     ),
-  },
-  {
-    title: 'Номер',
-    dataIndex: 'car_number',
-    key: 'car_number',
-    sorter: (a, b) => a.car_number < b.car_number,
+    sorter: (a, b) => sort(a, b, 'car_model'),
     sortDirections: ['descend', 'ascend'],
-  },
-  {
-    title: 'Арендатор',
-    dataIndex: 'car_tenant',
-    key: 'car_tenant',
-    sorter: (a, b) => a.car_tenant.id - b.car_tenant.id,
-    sortDirections: ['descend', 'ascend'],
-    render: text => (
-      <div>
-        {(text && `${text.name}`) || <Tag color="red">не заполнено</Tag>}
-      </div>
-    ),
   },
 ];
 
@@ -214,9 +221,8 @@ class App extends Component {
               onSearch={value => this.onFilterEnter(value, 'car_tenant')}
               style={{width: 350, margin: 5}}
             />
-            <Switch onChange={value => this.onSwitch({switch: value})}>
-              Aвтомобили на территории
-            </Switch>
+            <Text code>Автомобили на территории</Text>
+            <Switch onChange={value => this.onSwitch({switch: value})} />
           </Panel>
         </Collapse>
         <Modal
@@ -299,15 +305,16 @@ class App extends Component {
           </Form>
         </Modal>
         <Table
-          scroll={{y: 570}}
+          size="small"
+          scroll={{y: 530}}
           style={{border: '1px solid #d7d4d4'}}
           dataSource={filteredCars}
           columns={columns}
           rowKey={record => record.id}
           pagination={{
-            pageSizeOptions: ['8', '25', '40', '50', '100'],
+            pageSizeOptions: ['10', '25', '40', '50', '100'],
             showSizeChanger: true,
-            pageSize: 8,
+            pageSize: 100,
           }}
         />
       </div>
