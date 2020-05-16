@@ -2,18 +2,18 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import * as PropTypes from 'prop-types';
 import {Button} from 'antd';
-import {addCarToParking} from './actions/carActions';
 import './App.scss';
 import {ModalAddNewCar} from './components/Modals/ModalAddNewCar';
+import {ModalAddNewParkedCar} from './components/Modals/ModalAddNewParkedCar';
 import TableCars from './components/TableCars/TableCars';
 import Filter from './components/Filter/Filter';
-import {notification} from './helpers/notification';
 
 class App extends Component {
   constructor() {
     super();
     this.state = {
-      modalVisible: false,
+      modal1Visible: false,
+      modal2Visible: false,
       cars: [],
       filteredCars: [],
     };
@@ -24,21 +24,12 @@ class App extends Component {
     this.setState(data);
   };
 
-  setModalVisible = modalVisible => {
-    this.setState({modalVisible});
+  setModal1Visible = modal1Visible => {
+    this.setState({modal1Visible});
   };
 
-  addCarEntry = () => {
-    const {dispatch} = this.props;
-    const history = {
-      time_in: '16:55:48',
-      days: '15.05.2020',
-      last_flag: false,
-      car: 187,
-    };
-
-    dispatch(addCarToParking(history, notification));
-    this.setModalVisible(false);
+  setModal2Visible = modal2Visible => {
+    this.setState({modal2Visible});
   };
 
   render() {
@@ -50,10 +41,14 @@ class App extends Component {
           <Button
             type="primary"
             className="add-btn"
-            onClick={() => this.setModalVisible(true)}>
+            onClick={() => this.setModal1Visible(true)}>
             Добавить машину
           </Button>
-          <Button type="primary" className="add-btn" onClick={this.addCarEntry}>
+
+          <Button
+            type="primary"
+            className="add-btn"
+            onClick={() => this.setModal2Visible(true)}>
             Добавить машину на парковку
           </Button>
         </div>
@@ -65,8 +60,14 @@ class App extends Component {
         />
 
         <ModalAddNewCar
-          setModalVisible={this.setModalVisible}
-          modalVisible={this.state.modalVisible}
+          setModalVisible={this.setModal1Visible}
+          modalVisible={this.state.modal1Visible}
+          dispatch={this.props.dispatch}
+          cars={this.state.cars}
+        />
+        <ModalAddNewParkedCar
+          setModalVisible={this.setModal2Visible}
+          modalVisible={this.state.modal2Visible}
           dispatch={this.props.dispatch}
           cars={this.state.cars}
         />

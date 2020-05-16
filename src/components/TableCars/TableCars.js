@@ -85,7 +85,6 @@ class TableCars extends Component {
         pagination={{
           pageSizeOptions: ['10', '25', '40', '50', '100'],
           showSizeChanger: true,
-          pageSize: 10,
         }}
       />
     );
