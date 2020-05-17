@@ -17,6 +17,7 @@ class App extends Component {
       modal2Visible: false,
       cars: [],
       filteredCars: [],
+      filter: {name: ''},
     };
   }
 
@@ -40,8 +41,8 @@ class App extends Component {
   };
 
   render() {
-    const {cars, filteredCars} = this.state;
-    const {tenants, brands} = this.props;
+    const {cars, filteredCars, filter} = this.state;
+    const {tenants, brands, isLoading} = this.props;
 
     return (
       <div>
@@ -85,9 +86,11 @@ class App extends Component {
 
         <TableCars
           cars={cars}
+          filter={filter}
           filteredCars={filteredCars}
           onChangeCars={this.onChangeCars}
           dispatch={this.props.dispatch}
+          isLoading={isLoading}
         />
       </div>
     );
@@ -95,6 +98,7 @@ class App extends Component {
 }
 
 const mapStateToProps = store => ({
+  isLoading: store.isCarLoading,
   brands: store.brands,
   tenants: store.tenants,
 });
@@ -104,6 +108,7 @@ App.propTypes = {
   dispatch: PropTypes.func.isRequired,
   tenants: PropTypes.arrayOf(PropTypes.object),
   brands: PropTypes.arrayOf(PropTypes.object),
+  isLoading: PropTypes.bool,
 };
 
-App.defaultProps = {tenants: [], brands: []};
+App.defaultProps = {tenants: [], brands: [], isLoading: true};

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import axios from 'axios';
-import {Table, Tag} from 'antd';
+import {Table, Tag, Spin} from 'antd';
 import * as PropTypes from 'prop-types';
 import {sort} from '../../helpers/sort';
 import {receiveCars} from '../../actions/carActions';
@@ -72,21 +72,25 @@ class TableCars extends Component {
   };
 
   render() {
-    const {cars, filteredCars} = this.props;
-    const data = filteredCars.length ? filteredCars : cars;
+    const {cars, filteredCars, filter, isLoading} = this.props;
+    const data =
+      (filteredCars.length || filter.name) !== '' ? filteredCars : cars;
     return (
-      <Table
-        size="small"
-        scroll={{y: 530}}
-        style={{border: '1px solid #d7d4d4'}}
-        dataSource={data}
-        columns={columns}
-        rowKey={record => record.id}
-        pagination={{
-          pageSizeOptions: ['10', '25', '40', '50', '100'],
-          showSizeChanger: true,
-        }}
-      />
+      <div>
+        {isLoading && <Spin className="loading flex-column" />}
+        <Table
+          size="small"
+          scroll={{y: 530}}
+          style={{border: '1px solid #d7d4d4'}}
+          dataSource={data}
+          columns={columns}
+          rowKey={record => record.id}
+          pagination={{
+            pageSizeOptions: ['10', '25', '40', '50', '100'],
+            showSizeChanger: true,
+          }}
+        />
+      </div>
     );
   }
 }
@@ -96,7 +100,9 @@ TableCars.propTypes = {
   dispatch: PropTypes.func.isRequired,
   cars: PropTypes.arrayOf(PropTypes.object),
   filteredCars: PropTypes.arrayOf(PropTypes.object),
+  filter: PropTypes.objectOf(PropTypes.string).isRequired,
   onChangeCars: PropTypes.func.isRequired,
+  isLoading: PropTypes.bool,
 };
 
-TableCars.defaultProps = {cars: [], filteredCars: []};
+TableCars.defaultProps = {cars: [], filteredCars: [], isLoading: true};

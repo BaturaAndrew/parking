@@ -7,12 +7,13 @@ import {
   FAIL_ADDING_CAR,
 } from '../constants/constants';
 
-export default function cars(state = {}, action) {
+export default function cars(state = {isCarLoading: true}, action) {
   switch (action.type) {
     case RECIEVE_ALL_CARS: {
       return {
         ...state,
         cars: action.cars,
+        isCarLoading: action.isCarLoading,
       };
     }
     case RECIEVE_ALL_BRANDS: {
