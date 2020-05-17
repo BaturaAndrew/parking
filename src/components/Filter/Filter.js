@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
-import axios from 'axios';
+import {connect} from 'react-redux';
 import {Input, Collapse, Switch, Typography, Select} from 'antd';
 import * as PropTypes from 'prop-types';
-import {receiveCars} from '../../actions/carActions';
+import {getCarsOnTerritory} from '../../actions/carActions';
 import FilterCars from '../../helpers/FilterCars';
 
 const {Panel} = Collapse;
@@ -12,6 +12,7 @@ const {Option} = Select;
 class Filter extends Component {
   constructor() {
     super();
+    this.idCarsOnTerritory = [];
     this.state = {
       filter: {
         objFilter: {car_tenant: {name: ''}},
@@ -21,26 +22,23 @@ class Filter extends Component {
     };
   }
 
-  getCarsOnTerritory = () => {
-    const {dispatch, onChangeCars} = this.props;
-    axios.get('api/stat/here/').then(res => {
-      const {data} = res;
-      const idCarsOnTerritory = data.map(car => car.car);
-      dispatch(receiveCars(data));
+  shouldComponentUpdate(nextProps) {
+    const {idCarsOnTerritory} = nextProps;
+    if (nextProps.idCarsOnTerritory !== this.props.idCarsOnTerritory) {
+      this.idCarsOnTerritory = idCarsOnTerritory;
       this.setState(
         prevState => ({
-          carsOnTerritory: data,
           filter: {...prevState.filter, id: idCarsOnTerritory},
         }),
-
-        () => {
-          this.filter();
-          onChangeCars({
-            filter: {carsOnTerritory: data, idCarsOnTerritory},
-          });
-        }
+        this.filter()
       );
-    });
+    }
+    return true;
+  }
+
+  loadCarsOnTerritory = () => {
+    const {dispatch} = this.props;
+    dispatch(getCarsOnTerritory());
   };
 
   onSwitch = curState => {
@@ -50,7 +48,7 @@ class Filter extends Component {
     }));
 
     !this.state.switch
-      ? this.getCarsOnTerritory()
+      ? this.loadCarsOnTerritory()
       : this.setState(
           prevState => ({
             ...prevState,
@@ -81,7 +79,7 @@ class Filter extends Component {
   filter = () => {
     const {filter} = this.state;
     const {cars, onChangeCars} = this.props;
-
+    filter.id = this.idCarsOnTerritory;
     const filterCars = new FilterCars(cars, filter)
       .filterByObj()
       .filterByCarNumber()
@@ -115,7 +113,6 @@ class Filter extends Component {
             style={{width: 250, margin: 5}}>
             {children}
           </Select>
-
           <Input
             name="car_number"
             allowClear
@@ -125,6 +122,11 @@ class Filter extends Component {
             onChange={e => this.onFilterEnter(e.target.value, 'car_number')}
             style={{width: 250, margin: 5}}
           />
+
+          {/* // FIXME: this.state.filter.id is rendered but id isn't seen in this.filter
+            this.state.filter.id{filter.id.map(el => (
+            <div key={el}>{el}</div>
+          ))} */}
           <Text code>Автомобили на территории</Text>
           <Switch onChange={value => this.onSwitch({switch: value})} />
         </Panel>
@@ -132,15 +134,17 @@ class Filter extends Component {
     );
   }
 }
-
-export default Filter;
+const mapStoreToProps = store => ({idCarsOnTerritory: store.idCarsOnTerritory});
+export default connect(mapStoreToProps)(Filter);
 Filter.propTypes = {
   dispatch: PropTypes.func.isRequired,
   cars: PropTypes.arrayOf(PropTypes.object),
+  idCarsOnTerritory: PropTypes.arrayOf(PropTypes.number),
   onChangeCars: PropTypes.func.isRequired,
   tenants: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 Filter.defaultProps = {
   cars: [],
+  idCarsOnTerritory: [],
 };

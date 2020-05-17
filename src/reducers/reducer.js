@@ -2,6 +2,7 @@ import {
   RECIEVE_ALL_CARS,
   RECIEVE_ALL_BRANDS,
   RECIEVE_ALL_TENANTS,
+  RECIEVE_CARS_ON_TERRITORY,
   ADD_NEW_CAR,
   ADD_NEW_ENTRY,
   FAIL_ADDING_CAR,
@@ -13,6 +14,14 @@ export default function cars(state = {}, action) {
       return {
         ...state,
         cars: action.cars,
+        isCarLoading: action.isCarLoading,
+      };
+    }
+    case RECIEVE_CARS_ON_TERRITORY: {
+      return {
+        ...state,
+        idCarsOnTerritory: action.idCarsOnTerritory,
+        isCarLoading: action.isCarLoading,
       };
     }
     case RECIEVE_ALL_BRANDS: {

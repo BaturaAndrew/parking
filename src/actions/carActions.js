@@ -3,6 +3,7 @@ import {
   RECIEVE_ALL_CARS,
   RECIEVE_ALL_BRANDS,
   RECIEVE_ALL_TENANTS,
+  RECIEVE_CARS_ON_TERRITORY,
   ADD_NEW_CAR,
   ADD_NEW_ENTRY,
   FAIL_ADDING_CAR,
@@ -11,6 +12,11 @@ import {
 const receiveCars = cars => ({
   type: RECIEVE_ALL_CARS,
   cars,
+  isCarLoading: false,
+});
+const receiveCarsOnTerritory = idCarsOnTerritory => ({
+  type: RECIEVE_CARS_ON_TERRITORY,
+  idCarsOnTerritory,
   isCarLoading: false,
 });
 
@@ -55,7 +61,11 @@ const getAllTenants = () => dispatch => {
 };
 
 const getCarsOnTerritory = () => dispatch => {
-  axios.get('api/stat/here/').then(res => dispatch(receiveCars(res.data)));
+  axios.get('api/stat/here/').then(res => {
+    const {data} = res;
+    const idCarsOnTerritory = data.map(car => car.car);
+    dispatch(receiveCarsOnTerritory(idCarsOnTerritory));
+  });
 };
 
 const addCar = (car, cb) => dispatch => {
