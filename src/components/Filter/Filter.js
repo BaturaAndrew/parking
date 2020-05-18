@@ -23,25 +23,35 @@ class Filter extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
+    //  NOTE: or we can use UNSAFE_componentWillReceiveProps(nextProps) {
     const {idCarsOnTerritory} = nextProps;
     if (nextProps.idCarsOnTerritory !== this.props.idCarsOnTerritory) {
-      this.idCarsOnTerritory = idCarsOnTerritory;
       this.setState(
         prevState => ({
-          filter: {...prevState.filter, id: idCarsOnTerritory},
-        }),
-        this.filter()
+          filter: {
+            ...prevState.filter,
+            id: idCarsOnTerritory,
+          },
+        })
+        // NOTE: don't work
+        // this.filter()
       );
     }
     return true;
   }
 
+  componentDidUpdate() {
+    // NOTE:   work
+    this.filter();
+  }
+
   loadCarsOnTerritory = () => {
     const {dispatch} = this.props;
-    dispatch(getCarsOnTerritory());
+    // NOTE: we invoke this.filter as a callback func
+    dispatch(getCarsOnTerritory(this.filter));
   };
 
-  onSwitch = curState => {
+  onFilterSwitch = curState => {
     this.setState(prevState => ({
       ...prevState,
       switch: curState.switch,
@@ -79,19 +89,13 @@ class Filter extends Component {
   filter = () => {
     const {filter} = this.state;
     const {cars, onChangeCars} = this.props;
-    filter.id = this.idCarsOnTerritory;
     const filterCars = new FilterCars(cars, filter)
       .filterByObj()
       .filterByCarNumber()
       .filterByCarId()
       .getFilteredCars();
 
-    this.setState(
-      prevState => ({
-        ...prevState,
-      }),
-      onChangeCars({filteredCars: filterCars})
-    );
+    onChangeCars({filteredCars: filterCars});
   };
 
   render() {
@@ -122,13 +126,8 @@ class Filter extends Component {
             onChange={e => this.onFilterEnter(e.target.value, 'car_number')}
             style={{width: 250, margin: 5}}
           />
-
-          {/* // FIXME: this.state.filter.id is rendered but id isn't seen in this.filter
-            this.state.filter.id{filter.id.map(el => (
-            <div key={el}>{el}</div>
-          ))} */}
           <Text code>Автомобили на территории</Text>
-          <Switch onChange={value => this.onSwitch({switch: value})} />
+          <Switch onChange={value => this.onFilterSwitch({switch: value})} />
         </Panel>
       </Collapse>
     );

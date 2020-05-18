@@ -60,11 +60,12 @@ const getAllTenants = () => dispatch => {
   axios.get('api/tenants/').then(res => dispatch(receiveTenants(res.data)));
 };
 
-const getCarsOnTerritory = () => dispatch => {
+const getCarsOnTerritory = filter => dispatch => {
   axios.get('api/stat/here/').then(res => {
     const {data} = res;
     const idCarsOnTerritory = data.map(car => car.car);
     dispatch(receiveCarsOnTerritory(idCarsOnTerritory));
+    // filter();
   });
 };
 
