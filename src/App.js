@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {useState, useEffect} from 'react';
 import {connect} from 'react-redux';
 import * as PropTypes from 'prop-types';
 import {Button} from 'antd';
@@ -9,93 +9,79 @@ import {TableCars} from './components/TableCars/TableCars';
 import Filter from './components/Filter/Filter';
 import {getAllBrands, getAllTenants} from './actions/carActions';
 
-class App extends Component {
-  constructor() {
-    super();
-    this.state = {
-      modal1Visible: false,
-      modal2Visible: false,
-      cars: [],
-      filteredCars: [],
-      filter: {name: ''},
-    };
-  }
+const App = props => {
+  const [modal1Visible, setModal1Visible] = useState(false);
+  const [modal2Visible, setModal2Visible] = useState(false);
+  const [cars, setCars] = useState([]);
+  const [filteredCars, setFilteredCars] = useState([]);
 
-  componentDidMount() {
-    const {dispatch} = this.props;
+  useEffect(() => {
+    const {dispatch} = props;
     dispatch(getAllBrands());
     dispatch(getAllTenants());
-  }
+  }, []);
 
   // NOTE: here we change the array of cars
-  onChangeCars = data => {
-    this.setState(data);
+  const onChangeCars = data => {
+    setCars(data);
+  };
+  const onChangeFilteredCars = data => {
+    setFilteredCars(data);
   };
 
-  setModal1Visible = modal1Visible => {
-    this.setState({modal1Visible});
-  };
+  const {tenants, brands, isLoading} = props;
 
-  setModal2Visible = modal2Visible => {
-    this.setState({modal2Visible});
-  };
+  return (
+    <div>
+      <div className="button-block flex-row">
+        <Button
+          type="primary"
+          className="add-btn"
+          onClick={() => setModal1Visible(true)}>
+          Добавить машину
+        </Button>
 
-  render() {
-    const {cars, filteredCars, filter} = this.state;
-    const {tenants, brands, isLoading} = this.props;
-
-    return (
-      <div>
-        <div className="button-block flex-row">
-          <Button
-            type="primary"
-            className="add-btn"
-            onClick={() => this.setModal1Visible(true)}>
-            Добавить машину
-          </Button>
-
-          <Button
-            type="primary"
-            className="add-btn"
-            onClick={() => this.setModal2Visible(true)}>
-            Добавить машину на парковку
-          </Button>
-        </div>
-
-        <Filter
-          onChangeCars={this.onChangeCars}
-          cars={cars}
-          dispatch={this.props.dispatch}
-          tenants={tenants}
-        />
-
-        <ModalAddNewCar
-          setModalVisible={this.setModal1Visible}
-          modalVisible={this.state.modal1Visible}
-          dispatch={this.props.dispatch}
-          cars={this.state.cars}
-          brands={brands}
-          tenants={tenants}
-        />
-        <ModalAddNewParkedCar
-          setModalVisible={this.setModal2Visible}
-          modalVisible={this.state.modal2Visible}
-          dispatch={this.props.dispatch}
-          cars={this.state.cars}
-        />
-
-        <TableCars
-          cars={cars}
-          filter={filter}
-          filteredCars={filteredCars}
-          onChangeCars={this.onChangeCars}
-          dispatch={this.props.dispatch}
-          isLoading={isLoading}
-        />
+        <Button
+          type="primary"
+          className="add-btn"
+          onClick={() => setModal2Visible(true)}>
+          Добавить машину на парковку
+        </Button>
       </div>
-    );
-  }
-}
+
+      <Filter
+        onChangeFilteredCars={onChangeFilteredCars}
+        cars={cars}
+        dispatch={props.dispatch}
+        tenants={tenants}
+      />
+
+      <ModalAddNewCar
+        setModalVisible={setModal1Visible}
+        modalVisible={modal1Visible}
+        dispatch={props.dispatch}
+        cars={cars}
+        brands={brands}
+        tenants={tenants}
+      />
+      <ModalAddNewParkedCar
+        setModalVisible={setModal2Visible}
+        modalVisible={modal2Visible}
+        dispatch={props.dispatch}
+        cars={cars}
+      />
+
+      <TableCars
+        cars={cars}
+        filter={{name: ''}}
+        filteredCars={filteredCars}
+        onChangeCars={onChangeCars}
+        dispatch={props.dispatch}
+        isLoading={isLoading}
+      />
+    </div>
+  );
+};
 
 const mapStateToProps = store => ({
   isLoading: store.isCarLoading,

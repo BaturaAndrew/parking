@@ -57,7 +57,7 @@ const TableCars = props => {
     axios.get('api/cars').then(res => {
       const {data} = res;
       dispatch(receiveCars(data));
-      onChangeCars({cars: data});
+      onChangeCars(data);
     });
   }, []);
 

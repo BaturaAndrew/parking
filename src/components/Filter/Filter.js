@@ -88,14 +88,14 @@ class Filter extends Component {
 
   filter = () => {
     const {filter} = this.state;
-    const {cars, onChangeCars} = this.props;
+    const {cars, onChangeFilteredCars} = this.props;
     const filterCars = new FilterCars(cars, filter)
       .filterByObj()
       .filterByCarNumber()
       .filterByCarId()
       .getFilteredCars();
 
-    onChangeCars({filteredCars: filterCars});
+    onChangeFilteredCars(filterCars);
   };
 
   render() {
@@ -139,7 +139,7 @@ Filter.propTypes = {
   dispatch: PropTypes.func.isRequired,
   cars: PropTypes.arrayOf(PropTypes.object),
   idCarsOnTerritory: PropTypes.arrayOf(PropTypes.number),
-  onChangeCars: PropTypes.func.isRequired,
+  onChangeFilteredCars: PropTypes.func.isRequired,
   tenants: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
