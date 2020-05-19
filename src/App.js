@@ -5,7 +5,7 @@ import {Button} from 'antd';
 import './App.scss';
 import {ModalAddNewCar} from './components/Modals/ModalAddNewCar';
 import {ModalAddNewParkedCar} from './components/Modals/ModalAddNewParkedCar';
-import TableCars from './components/TableCars/TableCars';
+import {TableCars} from './components/TableCars/TableCars';
 import Filter from './components/Filter/Filter';
 import {getAllBrands, getAllTenants} from './actions/carActions';
 

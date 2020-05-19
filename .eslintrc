@@ -7,6 +7,8 @@
     "prettier/react"
   ],
   "rules": {
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": 0,
     "no-prototype-builtins": 0,
     // Allow jsx tags inside .js files.
     "react/jsx-filename-extension": [
@@ -80,7 +82,8 @@
   },
   "plugins": [
     "prettier",
-    "fp"
+    "fp",
+    "react-hooks"
   ],
   "settings": {
     "import/resolver": {

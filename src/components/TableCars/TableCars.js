@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {useEffect} from 'react';
 import axios from 'axios';
 import {Table, Tag, Spin} from 'antd';
 import * as PropTypes from 'prop-types';
@@ -51,51 +51,39 @@ const columns = [
   },
 ];
 
-class TableCars extends Component {
-  constructor() {
-    super();
-    this.form = React.createRef();
-    this.state = {};
-  }
-
-  componentDidMount() {
-    this.getAllCars();
-  }
-
-  getAllCars = () => {
-    const {dispatch, onChangeCars} = this.props;
+const TableCars = props => {
+  useEffect(() => {
+    const {dispatch, onChangeCars} = props;
     axios.get('api/cars').then(res => {
       const {data} = res;
       dispatch(receiveCars(data));
       onChangeCars({cars: data});
     });
-  };
+  }, []);
 
-  render() {
-    const {cars, filteredCars, filter, isLoading} = this.props;
-    const data =
-      (filteredCars.length || filter.name) !== '' ? filteredCars : cars;
-    return (
-      <div>
-        {isLoading && <Spin className="loading flex-column" />}
-        <Table
-          size="small"
-          scroll={{y: 530}}
-          style={{border: '1px solid #d7d4d4'}}
-          dataSource={data}
-          columns={columns}
-          rowKey={record => record.id}
-          pagination={{
-            pageSizeOptions: ['10', '25', '40', '50', '100'],
-            showSizeChanger: true,
-          }}
-        />
-      </div>
-    );
-  }
-}
+  const {cars, filteredCars, filter, isLoading} = props;
+  const data =
+    (filteredCars.length || filter.name) !== '' ? filteredCars : cars;
+  return (
+    <div>
+      {isLoading && <Spin className="loading flex-column" />}
+      <Table
+        size="small"
+        scroll={{y: 530}}
+        style={{border: '1px solid #d7d4d4'}}
+        dataSource={data}
+        columns={columns}
+        rowKey={record => record.id}
+        pagination={{
+          pageSizeOptions: ['10', '25', '40', '50', '100'],
+          showSizeChanger: true,
+        }}
+      />
+    </div>
+  );
+};
 
-export default TableCars;
+export {TableCars};
 TableCars.propTypes = {
   dispatch: PropTypes.func.isRequired,
   cars: PropTypes.arrayOf(PropTypes.object),
