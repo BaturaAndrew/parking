@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Button, Modal, Form, Input, Select} from 'antd';
 import {SendOutlined, ArrowLeftOutlined} from '@ant-design/icons';
 import * as PropTypes from 'prop-types';
@@ -9,26 +9,17 @@ import {isValidForm} from '../../helpers/isValidForm';
 const {Option} = Select;
 
 const ModalAddNewCar = props => {
-  const [car, setCar] = useState({
-    car_number: '',
-    car_brand: '',
-    car_model: '',
-    car_tenant: '',
-  });
   const form = React.createRef();
 
-  const onChange = curState => {
-    setCar(prevState => ({...prevState, ...curState}));
-  };
-
   const addNewCar = () => {
-    if (!isValidForm()) return;
+    if (!isValidForm(form)) return;
+    const objForm = form.current.getFieldsValue();
     const {dispatch, setModalVisible} = props;
     const newCar = {
-      car_number: car.car_number,
-      car_brand: +car.car_brand,
-      car_model: +car.car_model,
-      car_tenant: +car.car_tenant,
+      car_number: objForm.car_number,
+      car_brand: +objForm.car_brand,
+      car_model: +objForm.car_model,
+      car_tenant: +objForm.car_tenant,
     };
 
     dispatch(addCar(newCar, notification));
@@ -64,10 +55,7 @@ const ModalAddNewCar = props => {
           rules={[
             {required: true, message: 'Пожалуйста, введите номер авто!'},
           ]}>
-          <Input
-            placeholder="AA 2099-7"
-            onChange={e => onChange({car_number: e.target.value})}
-          />
+          <Input placeholder="AA 2099-7" />
         </Form.Item>
 
         <Form.Item
@@ -76,11 +64,7 @@ const ModalAddNewCar = props => {
           rules={[
             {required: true, message: 'Пожалуйста, введите бренда авто!'},
           ]}>
-          <Select
-            name="car_tenant"
-            allowClear
-            placeholder="134 (ГАЗ)"
-            onChange={value => onChange({car_brand: value})}>
+          <Select name="car_tenant" allowClear placeholder="134 (ГАЗ)">
             {childrenBrands}
           </Select>
         </Form.Item>
@@ -91,10 +75,7 @@ const ModalAddNewCar = props => {
           rules={[
             {required: true, message: 'Пожалуйста, введите модель авто!'},
           ]}>
-          <Input
-            placeholder="1878 (33023)"
-            onChange={e => onChange({car_model: e.target.value})}
-          />
+          <Input placeholder="1878 (33023)" />
         </Form.Item>
 
         <Form.Item
@@ -103,11 +84,7 @@ const ModalAddNewCar = props => {
           rules={[
             {required: true, message: 'Пожалуйста, введите арендатора!'},
           ]}>
-          <Select
-            name="car_tenant"
-            allowClear
-            placeholder="7 (Альфа-Банк ЗАО)"
-            onChange={value => onChange({car_tenant: value})}>
+          <Select name="car_tenant" allowClear placeholder="7 (Альфа-Банк ЗАО)">
             {childrenTenants}
           </Select>
         </Form.Item>
