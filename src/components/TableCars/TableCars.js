@@ -60,7 +60,7 @@ const TableCars = props => {
       // NOTE: use here, to get loaded data
       onChangeCars(data);
     });
-  }, [dispatch]);
+  }, [dispatch, onChangeCars]);
 
   const {cars, filteredCars, filter, isLoading} = props;
   const data = filteredCars.length || filter.name !== '' ? filteredCars : cars;

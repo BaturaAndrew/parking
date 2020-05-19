@@ -11,8 +11,8 @@ const {Text} = Typography;
 const {Option} = Select;
 
 const Filter = props => {
-  const [switcher, setSwitcher] = useState(false);
   const {dispatch, cars, onChangeFilteredCars, onChangeFilter} = props;
+  const [switcher, setSwitcher] = useState(false);
 
   useEffect(() => {
     if (switcher) {
@@ -26,14 +26,13 @@ const Filter = props => {
           id: idCarsOnTerritory,
         }));
       });
-    }
-    if (!switcher) {
+    } else {
       setFilter(prevState => ({
         ...prevState,
         id: [],
       }));
     }
-  }, [switcher, dispatch]);
+  }, [switcher]);
 
   const [filter, setFilter] = useState({
     objFilter: {car_tenant: {name: ''}},
@@ -94,7 +93,7 @@ const Filter = props => {
           style={{width: 250, margin: 5}}
         />
         <Text code>Автомобили на территории</Text>
-        <Switch onChange={value => setSwitcher({switcher: value})} />
+        <Switch onChange={value => setSwitcher(value)} />
       </Panel>
     </Collapse>
   );
