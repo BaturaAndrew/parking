@@ -1,9 +1,8 @@
 import React, {useState, useEffect} from 'react';
-import axios from 'axios';
 import {connect} from 'react-redux';
 import {Input, Collapse, Switch, Typography, Select} from 'antd';
 import * as PropTypes from 'prop-types';
-import {receiveCarsOnTerritory} from '../../actions/carActions';
+import {getCarsOnTerritory} from '../../actions/carActions';
 import FilterCars from '../../helpers/FilterCars';
 
 const {Panel} = Collapse;
@@ -11,21 +10,23 @@ const {Text} = Typography;
 const {Option} = Select;
 
 const Filter = props => {
-  const {dispatch, cars, onChangeFilteredCars, onChangeFilter} = props;
+  const {
+    dispatch,
+    cars,
+    onChangeFilteredCars,
+    onChangeFilter,
+    idCarsOnTerritory,
+  } = props;
   const [switcher, setSwitcher] = useState(false);
 
   useEffect(() => {
     if (switcher) {
-      axios.get('api/stat/here/').then(res => {
-        const {data} = res;
-        const idCarsOnTerritory = data.map(car => car.car);
-        dispatch(receiveCarsOnTerritory(idCarsOnTerritory));
+      dispatch(getCarsOnTerritory());
 
-        setFilter(prevState => ({
-          ...prevState,
-          id: idCarsOnTerritory,
-        }));
-      });
+      setFilter(prevState => ({
+        ...prevState,
+        id: idCarsOnTerritory,
+      }));
     } else {
       setFilter(prevState => ({
         ...prevState,
@@ -104,6 +105,7 @@ export default connect(mapStoreToProps)(Filter);
 Filter.propTypes = {
   dispatch: PropTypes.func.isRequired,
   cars: PropTypes.arrayOf(PropTypes.object),
+  idCarsOnTerritory: PropTypes.arrayOf(PropTypes.number),
   onChangeFilteredCars: PropTypes.func.isRequired,
   onChangeFilter: PropTypes.func.isRequired,
   tenants: PropTypes.arrayOf(PropTypes.object).isRequired,
@@ -111,4 +113,5 @@ Filter.propTypes = {
 
 Filter.defaultProps = {
   cars: [],
+  idCarsOnTerritory: [],
 };

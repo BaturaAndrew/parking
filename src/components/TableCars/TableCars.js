@@ -1,9 +1,7 @@
-import React, {useEffect} from 'react';
-import axios from 'axios';
+import React from 'react';
 import {Table, Tag, Spin} from 'antd';
 import * as PropTypes from 'prop-types';
 import {sort} from '../../helpers/sort';
-import {receiveCars} from '../../actions/carActions';
 
 const columns = [
   {
@@ -52,16 +50,6 @@ const columns = [
 ];
 
 const TableCars = props => {
-  const {dispatch, onChangeCars} = props;
-  useEffect(() => {
-    axios.get('api/cars').then(res => {
-      const {data} = res;
-      dispatch(receiveCars(data));
-      // NOTE: use here, to get loaded data
-      onChangeCars(data);
-    });
-  }, [dispatch]);
-
   const {cars, filteredCars, filter, isLoading} = props;
   const data = filteredCars.length || filter.name !== '' ? filteredCars : cars;
   return (
@@ -85,11 +73,9 @@ const TableCars = props => {
 
 export {TableCars};
 TableCars.propTypes = {
-  dispatch: PropTypes.func.isRequired,
   cars: PropTypes.arrayOf(PropTypes.object),
   filteredCars: PropTypes.arrayOf(PropTypes.object),
   filter: PropTypes.objectOf(PropTypes.string).isRequired,
-  onChangeCars: PropTypes.func.isRequired,
   isLoading: PropTypes.bool,
 };
 

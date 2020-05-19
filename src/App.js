@@ -7,25 +7,21 @@ import {ModalAddNewCar} from './components/Modals/ModalAddNewCar';
 import {ModalAddNewParkedCar} from './components/Modals/ModalAddNewParkedCar';
 import {TableCars} from './components/TableCars/TableCars';
 import Filter from './components/Filter/Filter';
-import {getAllBrands, getAllTenants} from './actions/carActions';
+import {getAllBrands, getAllTenants, getAllCars} from './actions/carActions';
 
 const App = props => {
   const [modal1Visible, setModal1Visible] = useState(false);
   const [modal2Visible, setModal2Visible] = useState(false);
-  const [cars, setCars] = useState([]);
   const [filteredCars, setFilteredCars] = useState([]);
   const [filter, setFilter] = useState({name: ''});
 
   const {dispatch} = props;
   useEffect(() => {
+    dispatch(getAllCars());
     dispatch(getAllBrands());
     dispatch(getAllTenants());
   }, [dispatch]);
 
-  // NOTE: here we change the array of cars
-  const onChangeCars = data => {
-    setCars(data);
-  };
   const onChangeFilteredCars = data => {
     setFilteredCars(data);
   };
@@ -33,7 +29,7 @@ const App = props => {
     setFilter(data);
   };
 
-  const {tenants, brands, isLoading} = props;
+  const {cars, idCarsOnTerritory, tenants, brands, isLoading} = props;
 
   return (
     <div>
@@ -59,6 +55,7 @@ const App = props => {
         cars={cars}
         dispatch={props.dispatch}
         tenants={tenants}
+        idCarsOnTerritory={idCarsOnTerritory}
       />
 
       <ModalAddNewCar
@@ -80,7 +77,6 @@ const App = props => {
         cars={cars}
         filter={filter}
         filteredCars={filteredCars}
-        onChangeCars={onChangeCars}
         dispatch={props.dispatch}
         isLoading={isLoading}
       />
@@ -89,6 +85,8 @@ const App = props => {
 };
 
 const mapStateToProps = store => ({
+  idCarsOnTerritory: store.idCarsOnTerritory,
+  cars: store.cars,
   isLoading: store.isCarLoading,
   brands: store.brands,
   tenants: store.tenants,
@@ -97,9 +95,17 @@ const mapStateToProps = store => ({
 export default connect(mapStateToProps)(App);
 App.propTypes = {
   dispatch: PropTypes.func.isRequired,
+  cars: PropTypes.arrayOf(PropTypes.object),
   tenants: PropTypes.arrayOf(PropTypes.object),
   brands: PropTypes.arrayOf(PropTypes.object),
+  idCarsOnTerritory: PropTypes.arrayOf(PropTypes.number),
   isLoading: PropTypes.bool,
 };
 
-App.defaultProps = {tenants: [], brands: [], isLoading: true};
+App.defaultProps = {
+  cars: [],
+  tenants: [],
+  brands: [],
+  isLoading: true,
+  idCarsOnTerritory: [],
+};

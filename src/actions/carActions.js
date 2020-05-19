@@ -56,6 +56,20 @@ const getAllTenants = () => dispatch => {
   axios.get('api/tenants/').then(res => dispatch(receiveTenants(res.data)));
 };
 
+const getAllCars = () => dispatch => {
+  axios.get('api/cars').then(res => {
+    const {data} = res;
+    dispatch(receiveCars(data));
+  });
+};
+const getCarsOnTerritory = () => dispatch => {
+  axios.get('api/stat/here/').then(res => {
+    const {data} = res;
+    const idCarsOnTerritory = data.map(car => car.car);
+    dispatch(receiveCarsOnTerritory(idCarsOnTerritory));
+  });
+};
+
 const addCar = (car, cb) => dispatch => {
   axios({
     method: 'post',
@@ -96,4 +110,6 @@ export {
   addCarToParking,
   getAllBrands,
   getAllTenants,
+  getAllCars,
+  getCarsOnTerritory,
 };
