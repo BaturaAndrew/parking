@@ -48,25 +48,12 @@ const failAdded = error => ({
   isCarAdded: false,
 });
 
-const getAllCars = () => dispatch => {
-  axios.get('api/cars').then(res => dispatch(receiveCars(res.data)));
-};
-
 const getAllBrands = () => dispatch => {
   axios.get('api/cars/brands/').then(res => dispatch(receiveBrands(res.data)));
 };
 
 const getAllTenants = () => dispatch => {
   axios.get('api/tenants/').then(res => dispatch(receiveTenants(res.data)));
-};
-
-const getCarsOnTerritory = filter => dispatch => {
-  axios.get('api/stat/here/').then(res => {
-    const {data} = res;
-    const idCarsOnTerritory = data.map(car => car.car);
-    dispatch(receiveCarsOnTerritory(idCarsOnTerritory));
-    // filter();
-  });
 };
 
 const addCar = (car, cb) => dispatch => {
@@ -104,11 +91,9 @@ const addCarToParking = (history, cb) => dispatch => {
 };
 export {
   receiveCars,
-  addNewCar,
-  getAllCars,
+  receiveCarsOnTerritory,
   addCar,
   addCarToParking,
-  getCarsOnTerritory,
   getAllBrands,
   getAllTenants,
 };

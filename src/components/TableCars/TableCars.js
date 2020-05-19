@@ -52,18 +52,18 @@ const columns = [
 ];
 
 const TableCars = props => {
+  const {dispatch, onChangeCars} = props;
   useEffect(() => {
-    const {dispatch, onChangeCars} = props;
     axios.get('api/cars').then(res => {
       const {data} = res;
       dispatch(receiveCars(data));
+      // NOTE: use here, to get loaded data
       onChangeCars(data);
     });
-  }, []);
+  }, [dispatch]);
 
   const {cars, filteredCars, filter, isLoading} = props;
-  const data =
-    (filteredCars.length || filter.name) !== '' ? filteredCars : cars;
+  const data = filteredCars.length || filter.name !== '' ? filteredCars : cars;
   return (
     <div>
       {isLoading && <Spin className="loading flex-column" />}

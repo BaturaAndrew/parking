@@ -14,12 +14,13 @@ const App = props => {
   const [modal2Visible, setModal2Visible] = useState(false);
   const [cars, setCars] = useState([]);
   const [filteredCars, setFilteredCars] = useState([]);
+  const [filter, setFilter] = useState({name: ''});
 
+  const {dispatch} = props;
   useEffect(() => {
-    const {dispatch} = props;
     dispatch(getAllBrands());
     dispatch(getAllTenants());
-  }, []);
+  }, [dispatch]);
 
   // NOTE: here we change the array of cars
   const onChangeCars = data => {
@@ -27,6 +28,9 @@ const App = props => {
   };
   const onChangeFilteredCars = data => {
     setFilteredCars(data);
+  };
+  const onChangeFilter = data => {
+    setFilter(data);
   };
 
   const {tenants, brands, isLoading} = props;
@@ -51,6 +55,7 @@ const App = props => {
 
       <Filter
         onChangeFilteredCars={onChangeFilteredCars}
+        onChangeFilter={onChangeFilter}
         cars={cars}
         dispatch={props.dispatch}
         tenants={tenants}
@@ -73,7 +78,7 @@ const App = props => {
 
       <TableCars
         cars={cars}
-        filter={{name: ''}}
+        filter={filter}
         filteredCars={filteredCars}
         onChangeCars={onChangeCars}
         dispatch={props.dispatch}
